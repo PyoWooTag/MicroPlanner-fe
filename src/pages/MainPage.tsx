@@ -1,7 +1,14 @@
+import { useState } from "react";
+
+import AddSchedulePage from "@/pages/AddSchedulePage";
 import CalendarPage from "@/pages/CalendarPage";
 import TimelinePage from "@/pages/TimelinePage";
+import type { ScheduleDraft } from "@/types/calendar";
 
 function MainPage() {
+  const [isScheduleFormOpen, setIsScheduleFormOpen] = useState(false);
+  const [scheduleDraft, setScheduleDraft] = useState<ScheduleDraft | null>(null);
+
   return (
     <div className="app-shell">
       <div className="app-frame">
@@ -11,9 +18,23 @@ function MainPage() {
           </div>
         </header>
 
-        <main className="calendar-layout">
+        <main
+          className={
+            isScheduleFormOpen
+              ? "calendar-layout schedule-add-open"
+              : "calendar-layout"
+          }
+        >
           <CalendarPage />
-          <TimelinePage />
+          <TimelinePage
+            scheduleDraft={isScheduleFormOpen ? scheduleDraft : null}
+            onAddSchedule={() => setIsScheduleFormOpen(true)}
+          />
+          <AddSchedulePage
+            isOpen={isScheduleFormOpen}
+            onDraftChange={setScheduleDraft}
+            onClose={() => setIsScheduleFormOpen(false)}
+          />
         </main>
       </div>
     </div>

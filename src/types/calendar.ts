@@ -9,6 +9,12 @@ export type CalendarEvent = {
   type: CalendarEventType;
 };
 
+export type ScheduleDraft = {
+  title: string;
+  startAt: string;
+  endAt: string;
+};
+
 export type CalendarCell = {
   key: string;
   date: Date;

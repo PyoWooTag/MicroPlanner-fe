@@ -8,6 +8,7 @@ type CalendarState = {
   visibleMonth: Date;
   selectedDate: Date;
   events: CalendarEvent[];
+  addEvent: (event: CalendarEvent) => void;
   selectDate: (date: Date) => void;
   goToday: () => void;
   goPreviousMonth: () => void;
@@ -20,6 +21,10 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   visibleMonth: getStartOfMonth(initialSelectedDate),
   selectedDate: initialSelectedDate,
   events: mockEvents,
+  addEvent: (event) =>
+    set((state) => ({
+      events: [...state.events, event],
+    })),
   selectDate: (date) =>
     set({
       selectedDate: date,
