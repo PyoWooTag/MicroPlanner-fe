@@ -1,0 +1,60 @@
+import type { CalendarEvent } from "@/types/calendar";
+
+export const mockEvents: CalendarEvent[] = [
+  {
+    id: "event-1",
+    title: "연구하자",
+    date: "2026-05-24",
+    start: "09:30",
+    end: "11:00",
+    type: "deep",
+  },
+  {
+    id: "event-2",
+    title: "영어하자",
+    date: "2026-05-24",
+    start: "13:00",
+    end: "14:00",
+    type: "light",
+  },
+  {
+    id: "event-3",
+    title: "과제하자",
+    date: "2026-05-24",
+    start: "16:00",
+    end: "17:30",
+    type: "deep",
+  },
+  {
+    id: "event-4",
+    title: "프젝하자",
+    date: "2026-05-24",
+    start: "20:00",
+    end: "21:00",
+    type: "light",
+  },
+  {
+    id: "event-5",
+    title: "기획 정리",
+    date: "2026-05-08",
+    start: "10:00",
+    end: "11:30",
+    type: "routine",
+  },
+  {
+    id: "event-6",
+    title: "운동",
+    date: "2026-05-18",
+    start: "07:00",
+    end: "08:00",
+    type: "light",
+  },
+  {
+    id: "event-7",
+    title: "리뷰 미팅",
+    date: "2026-05-27",
+    start: "15:00",
+    end: "16:00",
+    type: "deep",
+  },
+];
