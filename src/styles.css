@@ -79,6 +79,7 @@ button {
 }
 
 .header-actions,
+.month-actions,
 .timeline-actions {
   display: flex;
   align-items: center;
@@ -133,6 +134,24 @@ button {
 .header-actions svg {
   width: 24px;
   height: 24px;
+}
+
+.month-actions {
+  flex: 0 0 auto;
+}
+
+.month-actions .icon-button,
+.month-actions .text-button {
+  min-height: 40px;
+}
+
+.month-actions .icon-button {
+  width: 40px;
+}
+
+.month-actions .text-button {
+  padding: 0 14px;
+  font-weight: 650;
 }
 
 .primary-button {
@@ -479,6 +498,20 @@ button {
     margin-bottom: 8px;
   }
 
+  .month-actions {
+    gap: 6px;
+  }
+
+  .month-actions .icon-button {
+    width: 38px;
+    min-height: 38px;
+  }
+
+  .month-actions .text-button {
+    min-height: 38px;
+    padding: 0 10px;
+  }
+
   .month-grid {
     gap: 5px;
     padding-top: 8px;
@@ -530,6 +563,10 @@ button {
 
   .header-actions {
     justify-content: space-between;
+  }
+
+  .month-actions .text-button {
+    display: none;
   }
 
   .text-button,

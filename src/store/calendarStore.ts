@@ -2,18 +2,16 @@ import { create } from "zustand";
 
 import { mockEvents } from "@/data/mockEvents";
 import type { CalendarEvent } from "@/types/calendar";
-import { addMonths, getStartOfMonth, toDateKey } from "@/utils/calendar";
+import { addMonthsClamped, getStartOfMonth, toDateKey } from "@/utils/calendar";
 
 type CalendarState = {
   visibleMonth: Date;
   selectedDate: Date;
-  timelineOpen: boolean;
   events: CalendarEvent[];
   selectDate: (date: Date) => void;
   goToday: () => void;
   goPreviousMonth: () => void;
   goNextMonth: () => void;
-  toggleTimeline: () => void;
 };
 
 const initialSelectedDate = new Date(2026, 4, 24);
@@ -21,7 +19,6 @@ const initialSelectedDate = new Date(2026, 4, 24);
 export const useCalendarStore = create<CalendarState>((set) => ({
   visibleMonth: getStartOfMonth(initialSelectedDate),
   selectedDate: initialSelectedDate,
-  timelineOpen: true,
   events: mockEvents,
   selectDate: (date) =>
     set({
@@ -37,17 +34,23 @@ export const useCalendarStore = create<CalendarState>((set) => ({
     });
   },
   goPreviousMonth: () =>
-    set((state) => ({
-      visibleMonth: addMonths(state.visibleMonth, -1),
-    })),
+    set((state) => {
+      const selectedDate = addMonthsClamped(state.selectedDate, -1);
+
+      return {
+        selectedDate,
+        visibleMonth: getStartOfMonth(selectedDate),
+      };
+    }),
   goNextMonth: () =>
-    set((state) => ({
-      visibleMonth: addMonths(state.visibleMonth, 1),
-    })),
-  toggleTimeline: () =>
-    set((state) => ({
-      timelineOpen: !state.timelineOpen,
-    })),
+    set((state) => {
+      const selectedDate = addMonthsClamped(state.selectedDate, 1);
+
+      return {
+        selectedDate,
+        visibleMonth: getStartOfMonth(selectedDate),
+      };
+    }),
 }));
 
 export const getEventsByDate = (events: CalendarEvent[], date: Date) => {

@@ -19,6 +19,15 @@ export const getStartOfMonth = (date: Date) =>
 export const addMonths = (date: Date, amount: number) =>
   new Date(date.getFullYear(), date.getMonth() + amount, 1);
 
+export const addMonthsClamped = (date: Date, amount: number) => {
+  const targetYear = date.getFullYear();
+  const targetMonth = date.getMonth() + amount;
+  const lastDateOfTargetMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+  const targetDate = Math.min(date.getDate(), lastDateOfTargetMonth);
+
+  return new Date(targetYear, targetMonth, targetDate);
+};
+
 export const getCalendarCells = (
   visibleMonth: Date,
   selectedDate: Date,
