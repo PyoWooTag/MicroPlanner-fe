@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
 import { getEventsByDate, useCalendarStore } from "@/store/calendarStore";
@@ -17,6 +17,7 @@ const timelineEnd = 24 * 60;
 const minuteHeight = 0.95;
 const focusOffset = 140;
 const laneGap = 4;
+const minimumEventHeight = 30;
 
 type TimelineItem = {
   id: string;
@@ -43,6 +44,8 @@ const getDateFromLocalDateTime = (value: string) => {
 
 const getTimeFromLocalDateTime = (value: string) => value.slice(11, 16);
 
+const getMinutesFromDate = (date: Date) => date.getHours() * 60 + date.getMinutes();
+
 const getDurationMinutes = (startAt: string, endAt: string) =>
   Math.max(0, (new Date(endAt).getTime() - new Date(startAt).getTime()) / 60000);
 
@@ -61,7 +64,7 @@ const getEventTone = (type: CalendarEvent["type"]) => {
 const toTimelineItem = (event: CalendarEvent): TimelineItem => {
   const startMinutes = timeToMinutes(event.start);
   const rawEndMinutes = timeToMinutes(event.end);
-  const durationMinutes = Math.max(30, rawEndMinutes - startMinutes);
+  const durationMinutes = Math.max(1, rawEndMinutes - startMinutes);
 
   return {
     id: event.id,
@@ -133,7 +136,7 @@ const getItemStyle = (item: PositionedTimelineItem): CSSProperties => {
 
   return {
     top: Math.max(0, item.startMinutes - timelineStart) * minuteHeight,
-    height: Math.max(52, item.durationMinutes) * minuteHeight,
+    height: Math.max(minimumEventHeight, item.durationMinutes * minuteHeight),
     left: item.lane === 0 ? 0 : `calc(${leftPercent}% + ${laneGap}px)`,
     right: item.lane === item.laneCount - 1 ? 0 : `calc(${rightPercent}% + ${laneGap}px)`,
   };
@@ -146,6 +149,7 @@ type TimelinePageProps = {
 
 function TimelinePage({ onAddSchedule, scheduleDraft }: TimelinePageProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [now, setNow] = useState(() => new Date());
   const { events, selectedDate } = useCalendarStore();
   const displayDate = useMemo(
     () =>
@@ -160,6 +164,13 @@ function TimelinePage({ onAddSchedule, scheduleDraft }: TimelinePageProps) {
   );
   const selectedTitle = formatSelectedTitle(displayDate);
   const selectedDateKey = toDateKey(displayDate);
+  const nowDateKey = toDateKey(now);
+  const currentMinutes = getMinutesFromDate(now);
+  const shouldShowCurrentTime =
+    selectedDateKey === nowDateKey &&
+    currentMinutes >= timelineStart &&
+    currentMinutes <= timelineEnd;
+  const currentTimeTop = (currentMinutes - timelineStart) * minuteHeight;
   const draftItem =
     scheduleDraft &&
     scheduleDraft.startAt &&
@@ -183,6 +194,16 @@ function TimelinePage({ onAddSchedule, scheduleDraft }: TimelinePageProps) {
     () => layoutTimelineItems([...selectedEvents.map(toTimelineItem), ...(draftItem ? [draftItem] : [])]),
     [draftItem, selectedEvents],
   );
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setNow(new Date());
+    }, 30_000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   useEffect(() => {
     if (!scheduleDraft?.startAt) {
@@ -220,6 +241,14 @@ function TimelinePage({ onAddSchedule, scheduleDraft }: TimelinePageProps) {
               <span>{formatTimelineHour(hour)}</span>
             </div>
           ))}
+
+          {shouldShowCurrentTime && (
+            <div
+              className="current-time-line"
+              style={{ top: currentTimeTop }}
+              aria-hidden="true"
+            />
+          )}
 
           <div className="timeline-events-layer">
             {timelineItems.map((item) => (

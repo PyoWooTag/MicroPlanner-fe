@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import type { WheelEvent } from "react";
 
 import { useCalendarStore } from "@/store/calendarStore";
 import type { CalendarEvent } from "@/types/calendar";
@@ -9,7 +10,13 @@ import {
   WEEKDAYS,
 } from "@/utils/calendar";
 
+const monthWheelThreshold = 80;
+const monthWheelCooldown = 420;
+
 function CalendarPage() {
+  const wheelDeltaRef = useRef(0);
+  const wheelLockedRef = useRef(false);
+  const wheelUnlockTimerRef = useRef<number | null>(null);
   const {
     events,
     goNextMonth,
@@ -32,8 +39,58 @@ function CalendarPage() {
   }, [events]);
   const monthTitle = formatMonthTitle(visibleMonth);
 
+  const handleMonthWheel = useCallback(
+    (event: WheelEvent<HTMLElement>) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (wheelLockedRef.current) {
+        return;
+      }
+
+      wheelDeltaRef.current += event.deltaY;
+
+      if (Math.abs(wheelDeltaRef.current) < monthWheelThreshold) {
+        return;
+      }
+
+      if (wheelDeltaRef.current > 0) {
+        goNextMonth();
+      } else {
+        goPreviousMonth();
+      }
+
+      wheelDeltaRef.current = 0;
+      wheelLockedRef.current = true;
+
+      if (wheelUnlockTimerRef.current) {
+        window.clearTimeout(wheelUnlockTimerRef.current);
+      }
+
+      wheelUnlockTimerRef.current = window.setTimeout(() => {
+        wheelLockedRef.current = false;
+      }, monthWheelCooldown);
+    },
+    [goNextMonth, goPreviousMonth],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (wheelUnlockTimerRef.current) {
+        window.clearTimeout(wheelUnlockTimerRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <section className="month-panel" aria-labelledby="month-title">
+    <section
+      className="month-panel"
+      aria-labelledby="month-title"
+      onWheel={handleMonthWheel}
+    >
       <div className="panel-heading">
         <div>
           <h2 id="month-title">{monthTitle}</h2>

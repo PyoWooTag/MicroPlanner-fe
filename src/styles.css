@@ -458,6 +458,26 @@ button {
   inset: 0 0 0 18px;
 }
 
+.current-time-line {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 5;
+  border-top: 2px solid #e5483f;
+  pointer-events: none;
+}
+
+.current-time-line::before {
+  position: absolute;
+  top: -7px;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #e5483f;
+  content: "";
+}
+
 .time-slot {
   position: relative;
   border-top: 1px solid rgba(25, 24, 22, 0.07);
@@ -478,12 +498,12 @@ button {
   right: 0;
   left: 18px;
   display: flex;
-  min-height: 52px;
+  min-height: 30px;
   align-items: flex-start;
   flex-direction: row;
   justify-content: flex-start;
   gap: 8px;
-  padding: 12px 14px;
+  padding: 6px 12px;
   border: 1px solid rgba(25, 24, 22, 0.08);
   border-radius: 8px;
   box-shadow: 0 12px 24px rgba(68, 60, 47, 0.08);
@@ -493,7 +513,7 @@ button {
   overflow: hidden;
   font-size: 0.92rem;
   font-weight: 760;
-  line-height: 1.25;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -503,7 +523,7 @@ button {
   margin: 1px 0 0;
   color: #666158;
   font-size: 0.78rem;
-  line-height: 1.25;
+  line-height: 1.2;
   white-space: nowrap;
 }
 
