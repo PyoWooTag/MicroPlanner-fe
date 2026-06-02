@@ -9,6 +9,7 @@ type CalendarState = {
   selectedDate: Date;
   events: CalendarEvent[];
   addEvent: (event: CalendarEvent) => void;
+  updateEvent: (event: CalendarEvent) => void;
   selectDate: (date: Date) => void;
   goToday: () => void;
   goPreviousMonth: () => void;
@@ -24,6 +25,12 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   addEvent: (event) =>
     set((state) => ({
       events: [...state.events, event],
+    })),
+  updateEvent: (event) =>
+    set((state) => ({
+      events: state.events.map((current) =>
+        current.id === event.id ? event : current,
+      ),
     })),
   selectDate: (date) =>
     set({

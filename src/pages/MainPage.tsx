@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import AddSchedulePage from "@/pages/AddSchedulePage";
 import CalendarPage from "@/pages/CalendarPage";
 import TimelinePage from "@/pages/TimelinePage";
+import { useCalendarStore } from "@/store/calendarStore";
 import type { ScheduleDraft } from "@/types/calendar";
 
 function MainPage() {
   const [isScheduleFormOpen, setIsScheduleFormOpen] = useState(false);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [scheduleDraft, setScheduleDraft] = useState<ScheduleDraft | null>(null);
+  const events = useCalendarStore((state) => state.events);
+  const editingEvent = useMemo(
+    () => events.find((event) => event.id === editingEventId) ?? null,
+    [editingEventId, events],
+  );
+  const closeScheduleForm = () => {
+    setIsScheduleFormOpen(false);
+    setEditingEventId(null);
+  };
+  const openScheduleForm = () => {
+    setEditingEventId(null);
+    setScheduleDraft(null);
+    setIsScheduleFormOpen(true);
+  };
+  const openEditForm = (eventId: string) => {
+    setEditingEventId(eventId);
+    setScheduleDraft(null);
+    setIsScheduleFormOpen(true);
+  };
 
   return (
     <div className="app-shell">
@@ -27,13 +48,16 @@ function MainPage() {
         >
           <CalendarPage />
           <TimelinePage
+            editingEventId={isScheduleFormOpen ? editingEventId : null}
             scheduleDraft={isScheduleFormOpen ? scheduleDraft : null}
-            onAddSchedule={() => setIsScheduleFormOpen(true)}
+            onAddSchedule={openScheduleForm}
+            onEditSchedule={openEditForm}
           />
           <AddSchedulePage
+            editingEvent={editingEvent}
             isOpen={isScheduleFormOpen}
             onDraftChange={setScheduleDraft}
-            onClose={() => setIsScheduleFormOpen(false)}
+            onClose={closeScheduleForm}
           />
         </main>
       </div>

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 
 import { useCalendarStore } from "@/store/calendarStore";
-import type { ScheduleDraft } from "@/types/calendar";
+import type { CalendarEvent, ScheduleDraft } from "@/types/calendar";
 import { toDateKey } from "@/utils/calendar";
 
 type ScheduleField = "startAt" | "endAt";
@@ -15,6 +15,7 @@ type ScheduleFormValues = {
 };
 
 type AddSchedulePageProps = {
+  editingEvent: CalendarEvent | null;
   isOpen: boolean;
   onDraftChange: (draft: ScheduleDraft | null) => void;
   onClose: () => void;
@@ -30,6 +31,8 @@ const toDate = (localDateTime: string) => new Date(localDateTime);
 
 const getTimeFromLocalDateTime = (localDateTime: string) =>
   localDateTime.slice(11, 16);
+
+const toLocalDateTime = (date: string, time: string) => `${date}T${time}`;
 
 const createEventId = () => {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -70,23 +73,32 @@ const formatLocalDateTime = (value: string) => {
 };
 
 function AddSchedulePage({
+  editingEvent,
   isOpen,
   onClose,
   onDraftChange,
 }: AddSchedulePageProps) {
-  const { addEvent, selectDate, selectedDate } = useCalendarStore();
+  const { addEvent, selectDate, selectedDate, updateEvent } = useCalendarStore();
   const initialValues = useMemo(
-    () => ({
-      title: "",
-      startAt: "",
-      endAt: "",
-    }),
-    [selectedDate],
+    () =>
+      editingEvent
+        ? {
+            title: editingEvent.title,
+            startAt: toLocalDateTime(editingEvent.date, editingEvent.start),
+            endAt: toLocalDateTime(editingEvent.date, editingEvent.end),
+          }
+        : {
+            title: "",
+            startAt: "",
+            endAt: "",
+          },
+    [editingEvent],
   );
   const [formValues, setFormValues] = useState<ScheduleFormValues>(initialValues);
   const [activeField, setActiveField] = useState<ScheduleField | null>(null);
   const [draftDate, setDraftDate] = useState(toDateKey(selectedDate));
   const [draftTime, setDraftTime] = useState("09:00");
+  const isEditing = Boolean(editingEvent);
 
   useEffect(() => {
     if (!isOpen) {
@@ -96,9 +108,9 @@ function AddSchedulePage({
 
     setFormValues(initialValues);
     setActiveField(null);
-    setDraftDate(toDateKey(selectedDate));
+    setDraftDate(editingEvent?.date ?? toDateKey(selectedDate));
     setDraftTime("");
-  }, [initialValues, isOpen, onDraftChange, selectedDate]);
+  }, [editingEvent, initialValues, isOpen, onDraftChange, selectedDate]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -178,14 +190,21 @@ function AddSchedulePage({
 
     const startDate = toDate(formValues.startAt);
 
-    addEvent({
-      id: createEventId(),
+    const nextEvent = {
+      id: editingEvent?.id ?? createEventId(),
       title: formValues.title.trim(),
       date: toDateKey(startDate),
       start: getTimeFromLocalDateTime(formValues.startAt),
       end: getTimeFromLocalDateTime(formValues.endAt),
-      type: "light",
-    });
+      type: editingEvent?.type ?? "light",
+    };
+
+    if (editingEvent) {
+      updateEvent(nextEvent);
+    } else {
+      addEvent(nextEvent);
+    }
+
     selectDate(startDate);
     onClose();
   };
@@ -263,7 +282,7 @@ function AddSchedulePage({
             취소
           </button>
           <button className="primary-button" type="submit" disabled={!isFormValid}>
-            추가
+            {isEditing ? "저장" : "추가"}
           </button>
         </div>
       </form>

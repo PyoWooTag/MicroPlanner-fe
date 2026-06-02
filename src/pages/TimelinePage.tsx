@@ -143,11 +143,18 @@ const getItemStyle = (item: PositionedTimelineItem): CSSProperties => {
 };
 
 type TimelinePageProps = {
+  editingEventId: string | null;
   scheduleDraft: ScheduleDraft | null;
   onAddSchedule: () => void;
+  onEditSchedule: (eventId: string) => void;
 };
 
-function TimelinePage({ onAddSchedule, scheduleDraft }: TimelinePageProps) {
+function TimelinePage({
+  editingEventId,
+  onAddSchedule,
+  onEditSchedule,
+  scheduleDraft,
+}: TimelinePageProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [now, setNow] = useState(() => new Date());
   const { events, selectedDate } = useCalendarStore();
@@ -159,8 +166,11 @@ function TimelinePage({ onAddSchedule, scheduleDraft }: TimelinePageProps) {
     [scheduleDraft, selectedDate],
   );
   const selectedEvents = useMemo(
-    () => getEventsByDate(events, displayDate),
-    [displayDate, events],
+    () =>
+      getEventsByDate(events, displayDate).filter(
+        (event) => event.id !== editingEventId,
+      ),
+    [displayDate, editingEventId, events],
   );
   const selectedTitle = formatSelectedTitle(displayDate);
   const selectedDateKey = toDateKey(displayDate);
@@ -251,18 +261,42 @@ function TimelinePage({ onAddSchedule, scheduleDraft }: TimelinePageProps) {
           )}
 
           <div className="timeline-events-layer">
-            {timelineItems.map((item) => (
-              <article
-                className={item.className}
-                key={item.id}
-                style={getItemStyle(item)}
-              >
-                <h3>{item.title}</h3>
-                <p>
-                  {item.start} - {item.end}
-                </p>
-              </article>
-            ))}
+            {timelineItems.map((item) => {
+              const eventContent = (
+                <>
+                  <h3>{item.title}</h3>
+                  <p>
+                    {item.start} - {item.end}
+                  </p>
+                </>
+              );
+
+              if (item.id === "draft-preview") {
+                return (
+                  <article
+                    className={item.className}
+                    key={item.id}
+                    style={getItemStyle(item)}
+                  >
+                    {eventContent}
+                  </article>
+                );
+              }
+
+              return (
+                <button
+                  className={item.className}
+                  key={item.id}
+                  type="button"
+                  style={getItemStyle(item)}
+                  onClick={() => onEditSchedule(item.id)}
+                  aria-label={`${item.title} 일정 수정`}
+                  title={`${item.title} 일정 수정`}
+                >
+                  {eventContent}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

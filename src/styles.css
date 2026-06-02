@@ -506,6 +506,8 @@ button {
   padding: 6px 12px;
   border: 1px solid rgba(25, 24, 22, 0.08);
   border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
   box-shadow: 0 12px 24px rgba(68, 60, 47, 0.08);
 }
 
@@ -542,6 +544,7 @@ button {
 .event-card-preview {
   border: 2px dashed rgba(25, 24, 22, 0.42);
   background: rgba(255, 255, 255, 0.44);
+  cursor: default;
   box-shadow: none;
 }
 
