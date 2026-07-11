@@ -1,0 +1,65 @@
+﻿.calendar-layout {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(16px, 2.2vw, 28px);
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.month-panel,
+.timeline-panel,
+.add-schedule-panel {
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid rgba(25, 24, 22, 0.07);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 18px 50px rgba(68, 60, 47, 0.08);
+}
+
+.month-panel {
+  grid-column: 1;
+  grid-row: 1;
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
+}
+
+.timeline-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.add-schedule-panel {
+  grid-column: 2;
+  grid-row: 1;
+  transform: translateX(36px);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
+}
+
+.schedule-add-open .month-panel {
+  transform: translateX(calc(-100% - clamp(16px, 2.2vw, 28px)));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.schedule-add-open .timeline-panel {
+  grid-column: 1;
+}
+
+.schedule-add-open .add-schedule-panel {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.schedule-add-open .timeline-panel .floating-actions {
+  display: none;
+}
+

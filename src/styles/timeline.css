@@ -1,0 +1,215 @@
+﻿.timeline-panel {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.add-schedule-panel {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  --add-panel-padding: clamp(18px, 2.2vw, 30px);
+  padding: 0;
+}
+
+.timeline-panel-compact {
+  transform: translateX(10px);
+  opacity: 0.82;
+}
+
+.timeline-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: clamp(16px, 2vw, 26px) clamp(16px, 2vw, 26px);
+  border-bottom: 1px solid rgba(25, 24, 22, 0.08);
+}
+
+.timeline-header h2 {
+  font-size: clamp(1.12rem, 1.7vw, 1.34rem);
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.timeline-actions {
+  flex: 0 0 auto;
+  padding: clamp(10px, 1.4vw, 16px) clamp(16px, 2vw, 26px);
+}
+
+.timeline-scroll {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: clamp(8px, 1vw, 12px) clamp(16px, 2vw, 26px) clamp(16px, 2vw, 26px) clamp(66px, 5.8vw, 82px);
+}
+
+.timeline-track {
+  position: relative;
+  border-left: 1px solid rgba(25, 24, 22, 0.12);
+}
+
+.timeline-events-layer {
+  position: absolute;
+  inset: 0 0 0 18px;
+}
+
+.current-time-line {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 5;
+  border-top: 2px solid #e5483f;
+  pointer-events: none;
+}
+
+.current-time-line::before {
+  position: absolute;
+  top: -7px;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #e5483f;
+  content: "";
+}
+
+.time-slot {
+  position: relative;
+  border-top: 1px solid rgba(25, 24, 22, 0.07);
+}
+
+.time-slot span {
+  position: absolute;
+  top: -8px;
+  left: -72px;
+  width: 52px;
+  color: #8b877f;
+  font-size: 0.72rem;
+  text-align: right;
+}
+
+.event-card {
+  position: absolute;
+  right: 0;
+  left: 18px;
+  display: flex;
+  min-height: 30px;
+  align-items: flex-start;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid rgba(25, 24, 22, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 12px 24px rgba(68, 60, 47, 0.08);
+}
+
+.event-card h3 {
+  overflow: hidden;
+  font-size: 0.92rem;
+  font-weight: 760;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-card p {
+  flex: 0 0 auto;
+  margin: 1px 0 0;
+  color: #666158;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.event-card-deep {
+  background: #ece8df;
+}
+
+.event-card-light {
+  background: #ffffff;
+}
+
+.event-card-routine {
+  background: #eff4ef;
+}
+
+.event-card-preview {
+  border: 2px dashed rgba(25, 24, 22, 0.42);
+  background: rgba(255, 255, 255, 0.44);
+  cursor: grab;
+  overflow: visible;
+  box-shadow: none;
+}
+
+.event-card-preview:active {
+  cursor: grabbing;
+}
+
+.event-card-preview h3,
+.event-card-preview p {
+  color: #4e4a44;
+}
+
+.draft-resize-handle {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: ns-resize;
+}
+
+.draft-resize-handle:focus-visible {
+  outline: 0;
+}
+
+.draft-resize-handle-start {
+  top: -7px;
+}
+
+.draft-resize-handle-end {
+  bottom: -7px;
+}
+
+.floating-actions {
+  position: absolute;
+  right: clamp(16px, 1.8vw, 22px);
+  bottom: clamp(16px, 1.8vw, 22px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.floating-button {
+  width: clamp(42px, 4vw, 48px);
+  height: clamp(42px, 4vw, 48px);
+  padding: 0;
+  background: #ffffff;
+}
+
+.floating-button-primary {
+  width: clamp(60px, 5.6vw, 68px);
+  height: clamp(60px, 5.6vw, 68px);
+  border-color: #191816;
+  background: #191816;
+  color: #ffffff;
+}
+
+.floating-button-primary svg {
+  width: 28px;
+  height: 28px;
+}

@@ -1,0 +1,172 @@
+﻿@media (max-width: 1080px) {
+  .app-frame {
+    padding: 18px;
+  }
+
+  .calendar-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  }
+
+  .month-panel {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .timeline-panel {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .add-schedule-panel {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .schedule-add-open .month-panel {
+    transform: translateY(calc(-100% - clamp(16px, 2.2vw, 28px)));
+  }
+
+  .schedule-add-open .timeline-panel {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .schedule-add-open .add-schedule-panel {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .panel-heading h2 {
+    font-size: clamp(1.28rem, 3vw, 1.65rem);
+  }
+}
+
+@media (max-width: 720px) {
+  .app-frame {
+    padding: 12px;
+  }
+
+  .app-header {
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-actions {
+    width: auto;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+  }
+
+  .brand {
+    flex: 1 1 auto;
+  }
+
+  .month-panel {
+    padding: 12px;
+  }
+
+  .panel-heading {
+    align-items: center;
+    flex-direction: row;
+    margin-bottom: 8px;
+  }
+
+  .month-actions {
+    gap: 6px;
+  }
+
+  .month-actions .icon-button {
+    width: 38px;
+    min-height: 38px;
+  }
+
+  .month-actions .text-button {
+    min-height: 38px;
+    padding: 0 10px;
+  }
+
+  .month-grid {
+    gap: 5px;
+    padding-top: 8px;
+  }
+
+  .day-cell {
+    padding: 6px;
+  }
+
+  .event-dots {
+    right: 6px;
+    bottom: 6px;
+  }
+
+  .event-dots span:first-child {
+    width: 14px;
+    height: 5px;
+  }
+
+  .event-dots span:last-child {
+    width: 5px;
+    height: 5px;
+  }
+
+  .timeline-header,
+  .timeline-actions {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .timeline-actions {
+    align-items: center;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .timeline-scroll {
+    padding-right: 12px;
+    padding-left: 66px;
+  }
+
+}
+
+@media (max-width: 520px) {
+  .app-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    justify-content: space-between;
+  }
+
+  .month-actions .text-button {
+    display: none;
+  }
+
+  .text-button,
+  .primary-button {
+    padding: 0 10px;
+    white-space: nowrap;
+  }
+
+  .calendar-layout {
+    gap: 10px;
+    grid-template-rows: minmax(0, 0.86fr) minmax(0, 1.14fr);
+  }
+
+  .weekday-row {
+    font-size: 0.75rem;
+  }
+
+  .panel-heading h2 {
+    font-size: 1.32rem;
+  }
+
+  .timeline-header h2 {
+    font-size: 0.98rem;
+  }
+
+  .floating-actions {
+    display: none;
+  }
+}

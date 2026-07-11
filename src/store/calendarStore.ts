@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 import { mockEvents } from "@/data/mockEvents";
 import type { CalendarEvent } from "@/types/calendar";
-import { addMonths, getStartOfMonth, toDateKey } from "@/utils/calendar";
+import { addMonths, getStartOfMonth } from "@/utils/calendar";
 
 type CalendarState = {
   visibleMonth: Date;
@@ -62,11 +62,3 @@ export const useCalendarStore = create<CalendarState>((set) => ({
       };
     }),
 }));
-
-export const getEventsByDate = (events: CalendarEvent[], date: Date) => {
-  const key = toDateKey(date);
-
-  return events
-    .filter((event) => event.date === key)
-    .sort((left, right) => left.start.localeCompare(right.start));
-};

@@ -1,0 +1,210 @@
+﻿:root {
+  color: #191816;
+  background: #f4f1ea;
+  font-family:
+    Inter, Pretendard, "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  overflow: hidden;
+}
+
+button {
+  border: 0;
+  color: inherit;
+  font: inherit;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.app-shell {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(238, 232, 221, 0.84)),
+    #f4f1ea;
+}
+
+.app-frame {
+  display: flex;
+  width: min(1240px, 100%);
+  height: 100%;
+  min-height: 0;
+  margin: 0 auto;
+  padding: clamp(18px, 2.4vw, 32px) clamp(18px, 3vw, 40px);
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-header {
+  flex: 0 0 auto;
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: clamp(14px, 2vw, 24px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.brand h1,
+.panel-heading h2,
+.timeline-header h2,
+.event-card h3 {
+  margin: 0;
+}
+
+.brand h1 {
+  font-size: clamp(1.7rem, 2.4vw, 2.15rem);
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.header-actions,
+.month-actions,
+.timeline-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-button,
+.text-button,
+.primary-button,
+.floating-button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(25, 24, 22, 0.09);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.icon-button {
+  width: 40px;
+  padding: 0;
+}
+
+.text-button {
+  padding: 0 14px;
+}
+
+.header-actions .icon-button,
+.header-actions .text-button {
+  min-width: 50px;
+  min-height: 50px;
+}
+
+.header-actions .icon-button {
+  width: 50px;
+}
+
+.header-actions .text-button {
+  padding: 0 18px;
+  font-size: 1.02rem;
+  font-weight: 650;
+}
+
+.header-actions svg {
+  width: 24px;
+  height: 24px;
+}
+
+.month-actions {
+  flex: 0 0 auto;
+}
+
+.month-actions .icon-button,
+.month-actions .text-button {
+  min-height: 40px;
+}
+
+.month-actions .icon-button {
+  width: 40px;
+}
+
+.month-actions .text-button {
+  padding: 0 14px;
+  font-weight: 650;
+}
+
+.primary-button {
+  padding: 0 16px;
+  border-color: #191816;
+  background: #191816;
+  color: #ffffff;
+}
+
+.icon-button:hover,
+.text-button:hover,
+.floating-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(25, 24, 22, 0.18);
+  background: #ffffff;
+  box-shadow: 0 12px 26px rgba(68, 60, 47, 0.09);
+}
+
+.ghost-icon-button {
+  border-color: transparent;
+  background: transparent;
+}
+
+.add-schedule-header .ghost-icon-button {
+  width: 48px;
+  min-height: 48px;
+}
+
+.time-dialog-header .ghost-icon-button {
+  width: 44px;
+  min-height: 44px;
+}
+
+.ghost-icon-button:hover {
+  border-color: transparent;
+  background: rgba(25, 24, 22, 0.06);
+  box-shadow: none;
+}
+
+.primary-button:hover,
+.floating-button-primary:hover {
+  transform: translateY(-1px);
+  background: #31302d;
+  box-shadow: 0 16px 30px rgba(25, 24, 22, 0.16);
+}
+
