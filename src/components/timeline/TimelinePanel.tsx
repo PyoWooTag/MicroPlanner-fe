@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import type {
+  MouseEventHandler,
   MouseEvent as ReactMouseEvent,
   PointerEvent as ReactPointerEvent,
   RefObject,
@@ -28,6 +29,7 @@ type TimelinePanelProps = {
     event: ReactPointerEvent<HTMLButtonElement> | ReactMouseEvent<HTMLButtonElement>,
   ) => void;
   onEditSchedule: (eventId: string) => void;
+  onTimelineSlotClick: MouseEventHandler<HTMLDivElement>;
   scrollRef: RefObject<HTMLDivElement | null>;
   selectedTitle: string;
   shouldShowCurrentTime: boolean;
@@ -40,6 +42,7 @@ function TimelinePanel({
   onDraftMoveStart,
   onDraftResizeStart,
   onEditSchedule,
+  onTimelineSlotClick,
   scrollRef,
   selectedTitle,
   shouldShowCurrentTime,
@@ -55,6 +58,7 @@ function TimelinePanel({
       <div className="timeline-scroll" ref={scrollRef}>
         <div
           className="timeline-track"
+          onClick={onTimelineSlotClick}
           style={{ minHeight: (timelineEnd - timelineStart) * minuteHeight }}
         >
           {timeSlots.map((hour) => (
@@ -93,7 +97,7 @@ function TimelinePanel({
         <button
           className="floating-button floating-button-primary"
           type="button"
-          onClick={onAddSchedule}
+          onClick={() => onAddSchedule()}
           aria-label="일정 추가"
           title="일정 추가"
         >

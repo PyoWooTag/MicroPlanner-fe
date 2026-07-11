@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { MouseEvent as ReactMouseEvent } from "react";
 
 import { useDraftTimelineInteraction } from "@/hooks/useDraftTimelineInteraction";
 import { useCalendarStore } from "@/store/calendarStore";
@@ -22,12 +23,14 @@ import {
 
 type UseTimelinePanelControllerOptions = {
   editingEventId: string | null;
+  onAddSchedule: (draft?: ScheduleDraft | null) => void;
   scheduleDraft: ScheduleDraft | null;
   onDraftChange: (draft: ScheduleDraft) => void;
 };
 
 export const useTimelinePanelController = ({
   editingEventId,
+  onAddSchedule,
   scheduleDraft,
   onDraftChange,
 }: UseTimelinePanelControllerOptions) => {
@@ -103,11 +106,30 @@ export const useTimelinePanelController = ({
     });
   }, [scheduleDraft]);
 
+  const handleTimelineSlotClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    const trackTop = event.currentTarget.getBoundingClientRect().top;
+    const clickedMinutes = Math.max(
+      timelineStart,
+      Math.min(timelineEnd - 1, (event.clientY - trackTop) / minuteHeight),
+    );
+    const startHour = Math.floor(clickedMinutes / 60);
+    const endHour = startHour + 1;
+    const startTime = `${String(startHour).padStart(2, "0")}:00`;
+    const endTime = `${String(endHour).padStart(2, "0")}:00`;
+
+    onAddSchedule({
+      title: "",
+      startAt: `${selectedDateKey}T${startTime}`,
+      endAt: `${selectedDateKey}T${endTime}`,
+    });
+  };
+
   return {
     currentTimeTop: (currentMinutes - timelineStart) * minuteHeight,
     items,
     onDraftMoveStart: handleDraftMoveStart,
     onDraftResizeStart: handleDraftResizeStart,
+    onTimelineSlotClick: handleTimelineSlotClick,
     scrollRef,
     selectedTitle: formatSelectedTitle(displayDate),
     shouldShowCurrentTime,

@@ -54,6 +54,7 @@
 .timeline-track {
   position: relative;
   border-left: 1px solid rgba(25, 24, 22, 0.12);
+  cursor: pointer;
 }
 
 .timeline-events-layer {

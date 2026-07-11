@@ -24,11 +24,12 @@ export const useScheduleWorkspace = () => {
   const closeScheduleForm = () => {
     setIsScheduleFormOpen(false);
     setEditingEventId(null);
+    setScheduleDraft(null);
   };
 
-  const openScheduleForm = () => {
+  const openScheduleForm = (draft: ScheduleDraft | null = null) => {
     setEditingEventId(null);
-    setScheduleDraft(null);
+    setScheduleDraft(draft);
     setIsScheduleFormOpen(true);
   };
 

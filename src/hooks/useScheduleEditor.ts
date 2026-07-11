@@ -41,6 +41,7 @@ export const useScheduleEditor = ({
   const [activeField, setActiveField] = useState<ScheduleField | null>(null);
   const [draftDate, setDraftDate] = useState(selectedDateKey);
   const [draftTime, setDraftTime] = useState("09:00");
+  const initializingRef = useRef(false);
   const syncingFromDraftRef = useRef(false);
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export const useScheduleEditor = ({
       return;
     }
 
+    initializingRef.current = true;
     setFormValues(initialValues);
     setActiveField(null);
     setDraftDate(eventToEdit?.date ?? selectedDateKey);
@@ -64,8 +66,17 @@ export const useScheduleEditor = ({
       return;
     }
 
+    if (initializingRef.current) {
+      initializingRef.current = false;
+      return;
+    }
+
     if (syncingFromDraftRef.current) {
       syncingFromDraftRef.current = false;
+      return;
+    }
+
+    if (scheduleDraft && areDraftsEqual(formValues, scheduleDraft)) {
       return;
     }
 
@@ -74,7 +85,7 @@ export const useScheduleEditor = ({
     }
 
     onDraftChange(formValues);
-  }, [formValues, isOpen, onDraftChange]);
+  }, [formValues, isOpen, onDraftChange, scheduleDraft]);
 
   useEffect(() => {
     if (!isOpen || !scheduleDraft) {

@@ -42,6 +42,7 @@ function TimelineEventCard({
         className={item.className}
         key={item.id}
         style={getTimelineItemStyle(item)}
+        onClick={(event) => event.stopPropagation()}
         onPointerDown={onDraftMoveStart}
         onMouseDown={onDraftMoveStart}
       >
@@ -72,7 +73,10 @@ function TimelineEventCard({
       key={item.id}
       type="button"
       style={getTimelineItemStyle(item)}
-      onClick={() => onEditSchedule(item.id)}
+      onClick={(event) => {
+        event.stopPropagation();
+        onEditSchedule(item.id);
+      }}
       aria-label={`${item.title} 일정 수정`}
       title={`${item.title} 일정 수정`}
     >

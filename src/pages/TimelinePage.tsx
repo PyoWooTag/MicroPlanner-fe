@@ -5,7 +5,7 @@ import type { ScheduleDraft } from "@/types/calendar";
 type TimelinePageProps = {
   editingEventId: string | null;
   scheduleDraft: ScheduleDraft | null;
-  onAddSchedule: () => void;
+  onAddSchedule: (draft?: ScheduleDraft | null) => void;
   onDraftChange: (draft: ScheduleDraft) => void;
   onEditSchedule: (eventId: string) => void;
 };
@@ -19,6 +19,7 @@ function TimelinePage({
 }: TimelinePageProps) {
   const timelinePanel = useTimelinePanelController({
     editingEventId,
+    onAddSchedule,
     scheduleDraft,
     onDraftChange,
   });
