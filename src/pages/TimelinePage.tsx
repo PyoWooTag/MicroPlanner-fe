@@ -1,6 +1,10 @@
 import { Plus } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import type {
+  CSSProperties,
+  MouseEvent as ReactMouseEvent,
+  PointerEvent,
+} from "react";
 
 import { getEventsByDate, useCalendarStore } from "@/store/calendarStore";
 import type { CalendarEvent, ScheduleDraft } from "@/types/calendar";
@@ -18,6 +22,9 @@ const minuteHeight = 0.95;
 const focusOffset = 140;
 const laneGap = 4;
 const minimumEventHeight = 30;
+const resizeStepMinutes = 10;
+const minDraftDurationMinutes = 10;
+const maxSameDayEndMinutes = timelineEnd - resizeStepMinutes;
 
 type TimelineItem = {
   id: string;
@@ -45,6 +52,23 @@ const getDateFromLocalDateTime = (value: string) => {
 const getTimeFromLocalDateTime = (value: string) => value.slice(11, 16);
 
 const getMinutesFromDate = (date: Date) => date.getHours() * 60 + date.getMinutes();
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
+const snapToStep = (value: number) =>
+  Math.round(value / resizeStepMinutes) * resizeStepMinutes;
+
+const minutesToTime = (minutes: number) => {
+  const safeMinutes = clamp(minutes, timelineStart, maxSameDayEndMinutes);
+  const hour = Math.floor(safeMinutes / 60);
+  const minute = safeMinutes % 60;
+
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+};
+
+const toLocalDateTime = (dateKey: string, minutes: number) =>
+  `${dateKey}T${minutesToTime(minutes)}`;
 
 const getDurationMinutes = (startAt: string, endAt: string) =>
   Math.max(0, (new Date(endAt).getTime() - new Date(startAt).getTime()) / 60000);
@@ -146,16 +170,19 @@ type TimelinePageProps = {
   editingEventId: string | null;
   scheduleDraft: ScheduleDraft | null;
   onAddSchedule: () => void;
+  onDraftChange: (draft: ScheduleDraft) => void;
   onEditSchedule: (eventId: string) => void;
 };
 
 function TimelinePage({
   editingEventId,
   onAddSchedule,
+  onDraftChange,
   onEditSchedule,
   scheduleDraft,
 }: TimelinePageProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const resizeActiveRef = useRef(false);
   const [now, setNow] = useState(() => new Date());
   const { events, selectedDate } = useCalendarStore();
   const displayDate = useMemo(
@@ -229,6 +256,142 @@ function TimelinePage({
     });
   }, [scheduleDraft]);
 
+  const handleDraftResizeStart = (
+    edge: "start" | "end",
+    event: PointerEvent<HTMLButtonElement> | ReactMouseEvent<HTMLButtonElement>,
+  ) => {
+    if (!scheduleDraft?.startAt || !scheduleDraft.endAt) {
+      return;
+    }
+
+    if (resizeActiveRef.current) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    resizeActiveRef.current = true;
+
+    const dateKey = scheduleDraft.startAt.slice(0, 10);
+    const initialStartMinutes = timeToMinutes(
+      getTimeFromLocalDateTime(scheduleDraft.startAt),
+    );
+    const initialEndMinutes = timeToMinutes(
+      getTimeFromLocalDateTime(scheduleDraft.endAt),
+    );
+    const pointerStartY = event.clientY;
+
+    if ("pointerId" in event) {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+
+    const handleResizeMove = (
+      moveEvent: globalThis.PointerEvent | globalThis.MouseEvent,
+    ) => {
+      const deltaMinutes = snapToStep(
+        (moveEvent.clientY - pointerStartY) / minuteHeight,
+      );
+      const nextStartMinutes =
+        edge === "start"
+          ? clamp(
+              snapToStep(initialStartMinutes + deltaMinutes),
+              timelineStart,
+              initialEndMinutes - minDraftDurationMinutes,
+            )
+          : initialStartMinutes;
+      const nextEndMinutes =
+        edge === "end"
+          ? clamp(
+              snapToStep(initialEndMinutes + deltaMinutes),
+              initialStartMinutes + minDraftDurationMinutes,
+              maxSameDayEndMinutes,
+            )
+          : initialEndMinutes;
+
+      onDraftChange({
+        ...scheduleDraft,
+        startAt: toLocalDateTime(dateKey, nextStartMinutes),
+        endAt: toLocalDateTime(dateKey, nextEndMinutes),
+      });
+    };
+
+    const handleResizeEnd = () => {
+      resizeActiveRef.current = false;
+      window.removeEventListener("pointermove", handleResizeMove);
+      window.removeEventListener("mousemove", handleResizeMove);
+      window.removeEventListener("pointerup", handleResizeEnd);
+      window.removeEventListener("mouseup", handleResizeEnd);
+    };
+
+    window.addEventListener("pointermove", handleResizeMove);
+    window.addEventListener("mousemove", handleResizeMove);
+    window.addEventListener("pointerup", handleResizeEnd);
+    window.addEventListener("mouseup", handleResizeEnd);
+  };
+
+  const handleDraftMoveStart = (
+    event: PointerEvent<HTMLElement> | ReactMouseEvent<HTMLElement>,
+  ) => {
+    if (!scheduleDraft?.startAt || !scheduleDraft.endAt) {
+      return;
+    }
+
+    if (resizeActiveRef.current) {
+      return;
+    }
+
+    event.preventDefault();
+    resizeActiveRef.current = true;
+
+    const dateKey = scheduleDraft.startAt.slice(0, 10);
+    const initialStartMinutes = timeToMinutes(
+      getTimeFromLocalDateTime(scheduleDraft.startAt),
+    );
+    const initialEndMinutes = timeToMinutes(
+      getTimeFromLocalDateTime(scheduleDraft.endAt),
+    );
+    const durationMinutes = initialEndMinutes - initialStartMinutes;
+    const maxStartMinutes = maxSameDayEndMinutes - durationMinutes;
+    const pointerStartY = event.clientY;
+
+    if ("pointerId" in event) {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+
+    const handleMove = (
+      moveEvent: globalThis.PointerEvent | globalThis.MouseEvent,
+    ) => {
+      const deltaMinutes = snapToStep(
+        (moveEvent.clientY - pointerStartY) / minuteHeight,
+      );
+      const nextStartMinutes = clamp(
+        snapToStep(initialStartMinutes + deltaMinutes),
+        timelineStart,
+        maxStartMinutes,
+      );
+      const nextEndMinutes = nextStartMinutes + durationMinutes;
+
+      onDraftChange({
+        ...scheduleDraft,
+        startAt: toLocalDateTime(dateKey, nextStartMinutes),
+        endAt: toLocalDateTime(dateKey, nextEndMinutes),
+      });
+    };
+
+    const handleMoveEnd = () => {
+      resizeActiveRef.current = false;
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("pointerup", handleMoveEnd);
+      window.removeEventListener("mouseup", handleMoveEnd);
+    };
+
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("pointerup", handleMoveEnd);
+    window.addEventListener("mouseup", handleMoveEnd);
+  };
+
   return (
     <aside className="timeline-panel" aria-labelledby="timeline-title">
       <div className="timeline-header">
@@ -277,8 +440,34 @@ function TimelinePage({
                     className={item.className}
                     key={item.id}
                     style={getItemStyle(item)}
+                    onPointerDown={handleDraftMoveStart}
+                    onMouseDown={handleDraftMoveStart}
                   >
+                    <button
+                      className="draft-resize-handle draft-resize-handle-start"
+                      type="button"
+                      onPointerDown={(event) =>
+                        handleDraftResizeStart("start", event)
+                      }
+                      onMouseDown={(event) =>
+                        handleDraftResizeStart("start", event)
+                      }
+                      aria-label="시작 시간 조절"
+                      title="시작 시간 조절"
+                    />
                     {eventContent}
+                    <button
+                      className="draft-resize-handle draft-resize-handle-end"
+                      type="button"
+                      onPointerDown={(event) =>
+                        handleDraftResizeStart("end", event)
+                      }
+                      onMouseDown={(event) =>
+                        handleDraftResizeStart("end", event)
+                      }
+                      aria-label="종료 시간 조절"
+                      title="종료 시간 조절"
+                    />
                   </article>
                 );
               }

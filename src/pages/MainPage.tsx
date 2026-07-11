@@ -15,6 +15,20 @@ function MainPage() {
     () => events.find((event) => event.id === editingEventId) ?? null,
     [editingEventId, events],
   );
+  const editingEventDraft = useMemo(
+    () =>
+      editingEvent
+        ? {
+            title: editingEvent.title,
+            startAt: `${editingEvent.date}T${editingEvent.start}`,
+            endAt: `${editingEvent.date}T${editingEvent.end}`,
+          }
+        : null,
+    [editingEvent],
+  );
+  const activeScheduleDraft = isScheduleFormOpen
+    ? scheduleDraft ?? editingEventDraft
+    : null;
   const closeScheduleForm = () => {
     setIsScheduleFormOpen(false);
     setEditingEventId(null);
@@ -49,13 +63,15 @@ function MainPage() {
           <CalendarPage />
           <TimelinePage
             editingEventId={isScheduleFormOpen ? editingEventId : null}
-            scheduleDraft={isScheduleFormOpen ? scheduleDraft : null}
+            scheduleDraft={activeScheduleDraft}
             onAddSchedule={openScheduleForm}
+            onDraftChange={setScheduleDraft}
             onEditSchedule={openEditForm}
           />
           <AddSchedulePage
             editingEvent={editingEvent}
             isOpen={isScheduleFormOpen}
+            scheduleDraft={activeScheduleDraft}
             onDraftChange={setScheduleDraft}
             onClose={closeScheduleForm}
           />

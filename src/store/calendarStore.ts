@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 import { mockEvents } from "@/data/mockEvents";
 import type { CalendarEvent } from "@/types/calendar";
-import { addMonthsClamped, getStartOfMonth, toDateKey } from "@/utils/calendar";
+import { addMonths, getStartOfMonth, toDateKey } from "@/utils/calendar";
 
 type CalendarState = {
   visibleMonth: Date;
@@ -47,20 +47,18 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   },
   goPreviousMonth: () =>
     set((state) => {
-      const selectedDate = addMonthsClamped(state.selectedDate, -1);
+      const visibleMonth = addMonths(state.visibleMonth, -1);
 
       return {
-        selectedDate,
-        visibleMonth: getStartOfMonth(selectedDate),
+        visibleMonth,
       };
     }),
   goNextMonth: () =>
     set((state) => {
-      const selectedDate = addMonthsClamped(state.selectedDate, 1);
+      const visibleMonth = addMonths(state.visibleMonth, 1);
 
       return {
-        selectedDate,
-        visibleMonth: getStartOfMonth(selectedDate),
+        visibleMonth,
       };
     }),
 }));

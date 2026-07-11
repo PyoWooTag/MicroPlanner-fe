@@ -544,13 +544,42 @@ button {
 .event-card-preview {
   border: 2px dashed rgba(25, 24, 22, 0.42);
   background: rgba(255, 255, 255, 0.44);
-  cursor: default;
+  cursor: grab;
+  overflow: visible;
   box-shadow: none;
+}
+
+.event-card-preview:active {
+  cursor: grabbing;
 }
 
 .event-card-preview h3,
 .event-card-preview p {
   color: #4e4a44;
+}
+
+.draft-resize-handle {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: ns-resize;
+}
+
+.draft-resize-handle:focus-visible {
+  outline: 0;
+}
+
+.draft-resize-handle-start {
+  top: -7px;
+}
+
+.draft-resize-handle-end {
+  bottom: -7px;
 }
 
 .floating-actions {

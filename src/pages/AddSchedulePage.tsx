@@ -1,5 +1,5 @@
 import { Clock, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
 import { useCalendarStore } from "@/store/calendarStore";
@@ -17,6 +17,7 @@ type ScheduleFormValues = {
 type AddSchedulePageProps = {
   editingEvent: CalendarEvent | null;
   isOpen: boolean;
+  scheduleDraft: ScheduleDraft | null;
   onDraftChange: (draft: ScheduleDraft | null) => void;
   onClose: () => void;
 };
@@ -33,6 +34,17 @@ const getTimeFromLocalDateTime = (localDateTime: string) =>
   localDateTime.slice(11, 16);
 
 const toLocalDateTime = (date: string, time: string) => `${date}T${time}`;
+
+const areDraftsEqual = (
+  left: ScheduleFormValues,
+  right: ScheduleDraft,
+) =>
+  left.title === right.title &&
+  left.startAt === right.startAt &&
+  left.endAt === right.endAt;
+
+const hasDraftContent = (draft: ScheduleDraft) =>
+  draft.title.length > 0 || draft.startAt.length > 0 || draft.endAt.length > 0;
 
 const createEventId = () => {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -75,6 +87,7 @@ const formatLocalDateTime = (value: string) => {
 function AddSchedulePage({
   editingEvent,
   isOpen,
+  scheduleDraft,
   onClose,
   onDraftChange,
 }: AddSchedulePageProps) {
@@ -98,6 +111,8 @@ function AddSchedulePage({
   const [activeField, setActiveField] = useState<ScheduleField | null>(null);
   const [draftDate, setDraftDate] = useState(toDateKey(selectedDate));
   const [draftTime, setDraftTime] = useState("09:00");
+  const syncingFromDraftRef = useRef(false);
+  const selectedDateKey = toDateKey(selectedDate);
   const isEditing = Boolean(editingEvent);
 
   useEffect(() => {
@@ -108,17 +123,45 @@ function AddSchedulePage({
 
     setFormValues(initialValues);
     setActiveField(null);
-    setDraftDate(editingEvent?.date ?? toDateKey(selectedDate));
+    setDraftDate(editingEvent?.date ?? selectedDateKey);
     setDraftTime("");
-  }, [editingEvent, initialValues, isOpen, onDraftChange, selectedDate]);
+
+    if (editingEvent) {
+      onDraftChange(initialValues);
+    }
+  }, [editingEvent?.id, initialValues, isOpen, onDraftChange, selectedDateKey]);
 
   useEffect(() => {
     if (!isOpen) {
       return;
     }
 
+    if (syncingFromDraftRef.current) {
+      syncingFromDraftRef.current = false;
+      return;
+    }
+
+    if (!hasDraftContent(formValues)) {
+      return;
+    }
+
     onDraftChange(formValues);
   }, [formValues, isOpen, onDraftChange]);
+
+  useEffect(() => {
+    if (!isOpen || !scheduleDraft) {
+      return;
+    }
+
+    setFormValues((current) => {
+      if (areDraftsEqual(current, scheduleDraft)) {
+        return current;
+      }
+
+      syncingFromDraftRef.current = true;
+      return scheduleDraft;
+    });
+  }, [isOpen, scheduleDraft]);
 
   const isTimeValid = isTimeRangeValid(formValues.startAt, formValues.endAt);
   const isTimeSelected = hasTimeRange(formValues.startAt, formValues.endAt);
@@ -149,7 +192,7 @@ function AddSchedulePage({
     const [date, time] = formValues[field].split("T");
 
     setActiveField(field);
-    setDraftDate(date || toDateKey(selectedDate));
+    setDraftDate(date || selectedDateKey);
     setDraftTime(time || fallbackTime);
   };
 
