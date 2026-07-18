@@ -19,6 +19,7 @@ import {
 import type { DraftResizeEdge } from "@/utils/timeline";
 
 type DraftTimelineInteractionOptions = {
+  isTimelineTimeSelectionMode: boolean;
   scheduleDraft: ScheduleDraft | null;
   onDraftChange: (draft: ScheduleDraft) => void;
 };
@@ -32,6 +33,7 @@ type DraftResizeEvent =
   | ReactMouseEvent<HTMLButtonElement>;
 
 export const useDraftTimelineInteraction = ({
+  isTimelineTimeSelectionMode,
   scheduleDraft,
   onDraftChange,
 }: DraftTimelineInteractionOptions) => {
@@ -41,6 +43,10 @@ export const useDraftTimelineInteraction = ({
     edge: DraftResizeEdge,
     event: DraftResizeEvent,
   ) => {
+    if (!isTimelineTimeSelectionMode) {
+      return;
+    }
+
     if (!scheduleDraft?.startAt || !scheduleDraft.endAt) {
       return;
     }
@@ -111,6 +117,10 @@ export const useDraftTimelineInteraction = ({
   };
 
   const handleDraftMoveStart = (event: DraftMoveEvent) => {
+    if (!isTimelineTimeSelectionMode) {
+      return;
+    }
+
     if (!scheduleDraft?.startAt || !scheduleDraft.endAt) {
       return;
     }

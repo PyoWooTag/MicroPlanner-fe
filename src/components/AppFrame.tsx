@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 
 type AppFrameProps = {
-  isScheduleFormOpen: boolean;
+  isSidePanelOpen: boolean;
   children: ReactNode;
 };
 
-function AppFrame({ children, isScheduleFormOpen }: AppFrameProps) {
+function AppFrame({ children, isSidePanelOpen }: AppFrameProps) {
   return (
     <div className="app-shell">
       <div className="app-frame">
@@ -17,7 +17,7 @@ function AppFrame({ children, isScheduleFormOpen }: AppFrameProps) {
 
         <main
           className={
-            isScheduleFormOpen
+            isSidePanelOpen
               ? "calendar-layout schedule-add-open"
               : "calendar-layout"
           }

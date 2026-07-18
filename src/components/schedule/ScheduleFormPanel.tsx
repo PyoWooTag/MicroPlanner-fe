@@ -1,6 +1,7 @@
 import { Clock, X } from "lucide-react";
 import type { FormEvent } from "react";
 
+import SchedulePanel from "@/components/schedule/SchedulePanel";
 import ScheduleTimeDialog from "@/components/schedule/ScheduleTimeDialog";
 import {
   formatLocalDateTime,
@@ -49,27 +50,26 @@ function ScheduleFormPanel({
   onTimeChange,
   onTitleChange,
 }: ScheduleFormPanelProps) {
+  const panelTitle = isEditing ? "일정 수정" : "일정 추가";
+  const closeLabel = `${panelTitle} 닫기`;
+
   return (
-    <section
-      className="add-schedule-panel"
-      aria-hidden={!isOpen}
-      aria-labelledby="add-schedule-title"
-    >
-      <div className="add-schedule-header">
-        <h2 id="add-schedule-title" className="visually-hidden">
-          일정 추가
-        </h2>
+    <SchedulePanel
+      title={panelTitle}
+      titleId="schedule-editor-title"
+      isOpen={isOpen}
+      actions={
         <button
           className="icon-button ghost-icon-button"
           type="button"
           onClick={onClose}
-          aria-label="일정 추가 닫기"
-          title="일정 추가 닫기"
+          aria-label={closeLabel}
+          title={closeLabel}
         >
           <X size={26} />
         </button>
-      </div>
-
+      }
+    >
       <form className="schedule-form" onSubmit={onSubmit}>
         <label className="form-field">
           <input
@@ -132,7 +132,7 @@ function ScheduleFormPanel({
           onTimeChange={onTimeChange}
         />
       ) : null}
-    </section>
+    </SchedulePanel>
   );
 }
 

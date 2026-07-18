@@ -19,6 +19,8 @@ import {
 
 type TimelinePanelProps = {
   currentTimeTop: number;
+  isTimelineSlotCreationEnabled: boolean;
+  isTimelineTimeSelectionMode: boolean;
   items: PositionedTimelineItem[];
   onAddSchedule: () => void;
   onDraftMoveStart: (
@@ -28,7 +30,7 @@ type TimelinePanelProps = {
     edge: DraftResizeEdge,
     event: ReactPointerEvent<HTMLButtonElement> | ReactMouseEvent<HTMLButtonElement>,
   ) => void;
-  onEditSchedule: (eventId: string) => void;
+  onTimelineEventClick: (item: PositionedTimelineItem) => void;
   onTimelineSlotClick: MouseEventHandler<HTMLDivElement>;
   scrollRef: RefObject<HTMLDivElement | null>;
   selectedTitle: string;
@@ -37,11 +39,13 @@ type TimelinePanelProps = {
 
 function TimelinePanel({
   currentTimeTop,
+  isTimelineSlotCreationEnabled,
+  isTimelineTimeSelectionMode,
   items,
   onAddSchedule,
   onDraftMoveStart,
   onDraftResizeStart,
-  onEditSchedule,
+  onTimelineEventClick,
   onTimelineSlotClick,
   scrollRef,
   selectedTitle,
@@ -57,7 +61,11 @@ function TimelinePanel({
 
       <div className="timeline-scroll" ref={scrollRef}>
         <div
-          className="timeline-track"
+          className={
+            isTimelineSlotCreationEnabled
+              ? "timeline-track timeline-track-clickable"
+              : "timeline-track"
+          }
           onClick={onTimelineSlotClick}
           style={{ minHeight: (timelineEnd - timelineStart) * minuteHeight }}
         >
@@ -84,9 +92,10 @@ function TimelinePanel({
               <TimelineEventCard
                 item={item}
                 key={item.id}
+                isTimelineTimeSelectionMode={isTimelineTimeSelectionMode}
                 onDraftMoveStart={onDraftMoveStart}
                 onDraftResizeStart={onDraftResizeStart}
-                onEditSchedule={onEditSchedule}
+                onTimelineEventClick={onTimelineEventClick}
               />
             ))}
           </div>

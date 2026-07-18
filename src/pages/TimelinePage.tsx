@@ -4,22 +4,29 @@ import type { ScheduleDraft } from "@/types/calendar";
 
 type TimelinePageProps = {
   editingEventId: string | null;
+  isTimelineSlotCreationEnabled: boolean;
+  isTimelineTimeSelectionMode: boolean;
   scheduleDraft: ScheduleDraft | null;
   onAddSchedule: (draft?: ScheduleDraft | null) => void;
   onDraftChange: (draft: ScheduleDraft) => void;
-  onEditSchedule: (eventId: string) => void;
+  onSelectSchedule: (eventId: string) => void;
 };
 
 function TimelinePage({
   editingEventId,
+  isTimelineSlotCreationEnabled,
+  isTimelineTimeSelectionMode,
   onAddSchedule,
   onDraftChange,
-  onEditSchedule,
+  onSelectSchedule,
   scheduleDraft,
 }: TimelinePageProps) {
   const timelinePanel = useTimelinePanelController({
     editingEventId,
+    isTimelineSlotCreationEnabled,
+    isTimelineTimeSelectionMode,
     onAddSchedule,
+    onSelectSchedule,
     scheduleDraft,
     onDraftChange,
   });
@@ -28,7 +35,6 @@ function TimelinePage({
     <TimelinePanel
       {...timelinePanel}
       onAddSchedule={onAddSchedule}
-      onEditSchedule={onEditSchedule}
     />
   );
 }

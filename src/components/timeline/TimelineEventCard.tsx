@@ -10,6 +10,7 @@ import {
 } from "@/utils/timeline";
 
 type TimelineEventCardProps = {
+  isTimelineTimeSelectionMode: boolean;
   item: PositionedTimelineItem;
   onDraftMoveStart: (
     event: ReactPointerEvent<HTMLElement> | ReactMouseEvent<HTMLElement>,
@@ -18,15 +19,19 @@ type TimelineEventCardProps = {
     edge: DraftResizeEdge,
     event: ReactPointerEvent<HTMLButtonElement> | ReactMouseEvent<HTMLButtonElement>,
   ) => void;
-  onEditSchedule: (eventId: string) => void;
+  onTimelineEventClick: (item: PositionedTimelineItem) => void;
 };
 
 function TimelineEventCard({
+  isTimelineTimeSelectionMode,
   item,
   onDraftMoveStart,
   onDraftResizeStart,
-  onEditSchedule,
+  onTimelineEventClick,
 }: TimelineEventCardProps) {
+  const scheduleButtonLabel = isTimelineTimeSelectionMode
+    ? `${item.title} 시간에 일정 추가`
+    : `${item.title} 일정 상세`;
   const eventContent = (
     <>
       <h3>{item.title}</h3>
@@ -75,10 +80,10 @@ function TimelineEventCard({
       style={getTimelineItemStyle(item)}
       onClick={(event) => {
         event.stopPropagation();
-        onEditSchedule(item.id);
+        onTimelineEventClick(item);
       }}
-      aria-label={`${item.title} 일정 수정`}
-      title={`${item.title} 일정 수정`}
+      aria-label={scheduleButtonLabel}
+      title={scheduleButtonLabel}
     >
       {eventContent}
     </button>

@@ -4,49 +4,84 @@ import { useCalendarStore } from "@/store/calendarStore";
 import type { ScheduleDraft } from "@/types/calendar";
 import { toScheduleDraft } from "@/utils/scheduleDateTime";
 
+type SchedulePanelMode = "closed" | "detail" | "editor";
+
 export const useScheduleWorkspace = () => {
-  const [isScheduleFormOpen, setIsScheduleFormOpen] = useState(false);
-  const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [panelMode, setPanelMode] = useState<SchedulePanelMode>("closed");
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [scheduleDraft, setScheduleDraft] = useState<ScheduleDraft | null>(null);
-  const events = useCalendarStore((state) => state.events);
+  const { deleteEvent, events } = useCalendarStore();
   const eventToEdit = useMemo(
-    () => events.find((event) => event.id === editingEventId) ?? null,
-    [editingEventId, events],
+    () => events.find((event) => event.id === selectedEventId) ?? null,
+    [selectedEventId, events],
   );
   const eventToEditDraft = useMemo(
     () => (eventToEdit ? toScheduleDraft(eventToEdit) : null),
     [eventToEdit],
   );
-  const activeScheduleDraft = isScheduleFormOpen
+  const isEditorOpen = panelMode === "editor";
+  const isDetailOpen = panelMode === "detail";
+  const isSidePanelOpen = panelMode !== "closed";
+  const activeScheduleDraft = isEditorOpen
     ? scheduleDraft ?? eventToEditDraft
     : null;
 
-  const closeScheduleForm = () => {
-    setIsScheduleFormOpen(false);
-    setEditingEventId(null);
+  const closeSidePanel = () => {
+    setPanelMode("closed");
+    setSelectedEventId(null);
     setScheduleDraft(null);
+  };
+
+  const closeScheduleEditor = () => {
+    setScheduleDraft(null);
+
+    if (selectedEventId) {
+      setPanelMode("detail");
+      return;
+    }
+
+    setPanelMode("closed");
   };
 
   const openScheduleForm = (draft: ScheduleDraft | null = null) => {
-    setEditingEventId(null);
+    setSelectedEventId(null);
     setScheduleDraft(draft);
-    setIsScheduleFormOpen(true);
+    setPanelMode("editor");
   };
 
-  const openEditForm = (eventId: string) => {
-    setEditingEventId(eventId);
+  const openScheduleDetail = (eventId: string) => {
+    setSelectedEventId(eventId);
     setScheduleDraft(null);
-    setIsScheduleFormOpen(true);
+    setPanelMode("detail");
+  };
+
+  const openScheduleEditor = () => {
+    setScheduleDraft(null);
+    setPanelMode("editor");
+  };
+
+  const deleteSelectedEvent = () => {
+    if (!selectedEventId) {
+      return;
+    }
+
+    deleteEvent(selectedEventId);
+    closeSidePanel();
   };
 
   return {
     activeScheduleDraft,
-    closeScheduleForm,
-    editingEventId,
+    closeScheduleEditor,
+    closeSidePanel,
+    deleteSelectedEvent,
     eventToEdit,
-    isScheduleFormOpen,
-    openEditForm,
+    isDetailOpen,
+    isEditorOpen,
+    isSidePanelOpen,
+    openScheduleDetail,
+    openScheduleEditor,
     openScheduleForm,
+    selectedEventId,
     setScheduleDraft,
   };
 };

@@ -9,6 +9,7 @@ type CalendarState = {
   selectedDate: Date;
   events: CalendarEvent[];
   addEvent: (event: CalendarEvent) => void;
+  deleteEvent: (eventId: string) => void;
   updateEvent: (event: CalendarEvent) => void;
   selectDate: (date: Date) => void;
   goToday: () => void;
@@ -25,6 +26,10 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   addEvent: (event) =>
     set((state) => ({
       events: [...state.events, event],
+    })),
+  deleteEvent: (eventId) =>
+    set((state) => ({
+      events: state.events.filter((event) => event.id !== eventId),
     })),
   updateEvent: (event) =>
     set((state) => ({

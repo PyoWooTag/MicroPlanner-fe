@@ -23,14 +23,20 @@ import {
 
 type UseTimelinePanelControllerOptions = {
   editingEventId: string | null;
+  isTimelineSlotCreationEnabled: boolean;
+  isTimelineTimeSelectionMode: boolean;
   onAddSchedule: (draft?: ScheduleDraft | null) => void;
+  onSelectSchedule: (eventId: string) => void;
   scheduleDraft: ScheduleDraft | null;
   onDraftChange: (draft: ScheduleDraft) => void;
 };
 
 export const useTimelinePanelController = ({
   editingEventId,
+  isTimelineSlotCreationEnabled,
+  isTimelineTimeSelectionMode,
   onAddSchedule,
+  onSelectSchedule,
   scheduleDraft,
   onDraftChange,
 }: UseTimelinePanelControllerOptions) => {
@@ -39,6 +45,7 @@ export const useTimelinePanelController = ({
   const { events, selectedDate } = useCalendarStore();
   const { handleDraftMoveStart, handleDraftResizeStart } =
     useDraftTimelineInteraction({
+      isTimelineTimeSelectionMode,
       scheduleDraft,
       onDraftChange,
     });
@@ -107,6 +114,10 @@ export const useTimelinePanelController = ({
   }, [scheduleDraft]);
 
   const handleTimelineSlotClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if (!isTimelineSlotCreationEnabled) {
+      return;
+    }
+
     const trackTop = event.currentTarget.getBoundingClientRect().top;
     const clickedMinutes = Math.max(
       timelineStart,
@@ -124,11 +135,27 @@ export const useTimelinePanelController = ({
     });
   };
 
+  const handleTimelineEventClick = (item: { id: string; start: string; end: string }) => {
+    if (!isTimelineTimeSelectionMode) {
+      onSelectSchedule(item.id);
+      return;
+    }
+
+    onAddSchedule({
+      title: "",
+      startAt: `${selectedDateKey}T${item.start}`,
+      endAt: `${selectedDateKey}T${item.end}`,
+    });
+  };
+
   return {
     currentTimeTop: (currentMinutes - timelineStart) * minuteHeight,
+    isTimelineSlotCreationEnabled,
     items,
+    isTimelineTimeSelectionMode,
     onDraftMoveStart: handleDraftMoveStart,
     onDraftResizeStart: handleDraftResizeStart,
+    onTimelineEventClick: handleTimelineEventClick,
     onTimelineSlotClick: handleTimelineSlotClick,
     scrollRef,
     selectedTitle: formatSelectedTitle(displayDate),

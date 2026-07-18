@@ -1,4 +1,5 @@
 import AppFrame from "@/components/AppFrame";
+import ScheduleDetailPanel from "@/components/schedule/ScheduleDetailPanel";
 import { useScheduleWorkspace } from "@/hooks/useScheduleWorkspace";
 import CalendarPage from "@/pages/CalendarPage";
 import ScheduleEditorPage from "@/pages/ScheduleEditorPage";
@@ -7,31 +8,47 @@ import TimelinePage from "@/pages/TimelinePage";
 function MainPage() {
   const {
     activeScheduleDraft,
-    closeScheduleForm,
-    editingEventId,
+    closeScheduleEditor,
+    closeSidePanel,
+    deleteSelectedEvent,
     eventToEdit,
-    isScheduleFormOpen,
-    openEditForm,
+    isDetailOpen,
+    isEditorOpen,
+    isSidePanelOpen,
+    openScheduleDetail,
+    openScheduleEditor,
     openScheduleForm,
+    selectedEventId,
     setScheduleDraft,
   } = useScheduleWorkspace();
+  const isTimelineTimeSelectionMode = isEditorOpen;
+  const isTimelineSlotCreationEnabled = !isDetailOpen;
 
   return (
-    <AppFrame isScheduleFormOpen={isScheduleFormOpen}>
+    <AppFrame isSidePanelOpen={isSidePanelOpen}>
       <CalendarPage />
       <TimelinePage
-        editingEventId={isScheduleFormOpen ? editingEventId : null}
+        editingEventId={isEditorOpen ? selectedEventId : null}
+        isTimelineSlotCreationEnabled={isTimelineSlotCreationEnabled}
+        isTimelineTimeSelectionMode={isTimelineTimeSelectionMode}
         scheduleDraft={activeScheduleDraft}
         onAddSchedule={openScheduleForm}
         onDraftChange={setScheduleDraft}
-        onEditSchedule={openEditForm}
+        onSelectSchedule={openScheduleDetail}
+      />
+      <ScheduleDetailPanel
+        event={eventToEdit}
+        isOpen={isDetailOpen}
+        onClose={closeSidePanel}
+        onDelete={deleteSelectedEvent}
+        onEdit={openScheduleEditor}
       />
       <ScheduleEditorPage
         eventToEdit={eventToEdit}
-        isOpen={isScheduleFormOpen}
+        isOpen={isEditorOpen}
         scheduleDraft={activeScheduleDraft}
         onDraftChange={setScheduleDraft}
-        onClose={closeScheduleForm}
+        onClose={closeScheduleEditor}
       />
     </AppFrame>
   );

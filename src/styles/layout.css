@@ -53,7 +53,7 @@
   grid-column: 1;
 }
 
-.schedule-add-open .add-schedule-panel {
+.schedule-add-open .add-schedule-panel[aria-hidden="false"] {
   transform: translateX(0);
   opacity: 1;
   pointer-events: auto;
